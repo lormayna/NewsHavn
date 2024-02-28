@@ -1,0 +1,39 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  build:
+    desc: Build the go binary.
+    cmds:
+      - go build -o bin/app cmd/server/main.go
+
+  run:
+    desc: Build the go binary and then run the application
+    cmds:
+      - task: build
+      - ./bin/app  
+
+  test:
+    desc: Run the tests suite
+    cmds:
+      - go test -v ./... -count=1
+
+  c:
+    desc: Reformat the code with gofmt
+    cmds:
+      - gofmt -s -w .
+
+  db:
+    desc: Create db
+    cmds:
+      - touch mydatabase.db
+      - sqlite3 mydatabase.db < scripts/init_db.sql
+
+  docker:
+    desc: Run the app with Docker
+    dotenv: ['.env']
+    cmds:
+      - docker build -t newshavn .
+      - docker run -e $API_KEY -e $AWS_ACCESS_KEY_ID -e $AWS_SECRET_ACCESS_KEY -e $S3_URL --rm -p 8080:8080 newshavn
+
